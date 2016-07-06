@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow-definition xmlns="urn:liferay.com:liferay-workflow_6.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:liferay.com:liferay-workflow_6.2.0 http://www.liferay.com/dtd/liferay-workflow-definition_6_2_0.xsd">
+	<name>Ticket Process</name>
+	<version>1</version>
+	<state>
+		<name>StartNode</name>
+		<metadata><![CDATA[{"transitions":{"Resolution":{"bendpoints":[]},"Developer":{"bendpoints":[]}},"xy":[100,50]}]]></metadata>
+		<initial>true</initial>
+		<transitions>
+			<transition>
+				<name>Developer</name>
+				<target>Developer</target>
+			</transition>
+		</transitions>
+	</state>
+	<task>
+		<name>Developer</name>
+		<metadata><![CDATA[{"transitions":{"EndNode":{"bendpoints":[]},"Pass to QA":{"bendpoints":[]}},"xy":[500,35]}]]></metadata>
+        <actions>
+            <notification>
+                <name>newNotification1</name>
+                <template>You have new notification</template>
+                <template-language>freemarker</template-language>
+                <notification-type>user-notification</notification-type>
+                <execution-type>onEntry</execution-type>
+            </notification>
+        </actions>
+		<assignments>
+			<user />
+		</assignments>
+		<transitions>
+			<transition>
+				<name>Pass to QA</name>
+				<target>Pass to QA</target>
+			</transition>
+		</transitions>
+	</task>
+	<state>
+		<name>EndNode</name>
+		<metadata><![CDATA[{"terminal":true,"xy":[273,343]}]]></metadata>
+		<actions>
+			<action>
+				<name>approve</name>
+				<script><![CDATA[Packages.com.liferay.portal.kernel.workflow.WorkflowStatusManagerUtil.updateStatus(Packages.com.liferay.portal.kernel.workflow.WorkflowConstants.toStatus("approved"), workflowContext);]]></script>
+				<script-language>javascript</script-language>
+				<execution-type>onEntry</execution-type>
+			</action>
+		</actions>
+	</state>
+	<fork>
+		<name>Pass to QA</name>
+		<metadata><![CDATA[{"transitions":{"QA":{"bendpoints":[]},"QA Management":{"bendpoints":[]}},"xy":[730,37]}]]></metadata>
+		<transitions>
+			<transition>
+				<name>QA</name>
+				<target>QA</target>
+			</transition>
+			<transition>
+				<name>QA Management</name>
+				<target>QA Management</target>
+			</transition>
+		</transitions>
+	</fork>
+	<task>
+		<name>QA</name>
+		<metadata><![CDATA[{"transitions":{"Pass to QA Join":{"bendpoints":[]}},"xy":[579,170]}]]></metadata>
+		<assignments>
+			<user>
+				<screen-name>test</screen-name>
+			</user>
+		</assignments>
+		<transitions>
+			<transition>
+				<name>Pass to QA Join</name>
+				<target>Pass to QA Join</target>
+			</transition>
+		</transitions>
+	</task>
+	<task>
+		<name>QA Management</name>
+		<metadata><![CDATA[{"transitions":{"Pass to QA Join":{"bendpoints":[]}},"xy":[859,170]}]]></metadata>
+		<assignments>
+			<user>
+				<screen-name>test</screen-name>
+			</user>
+		</assignments>
+		<transitions>
+			<transition>
+				<name>Pass to QA Join</name>
+				<target>Pass to QA Join</target>
+			</transition>
+		</transitions>
+	</task>
+	<join>
+		<name>Pass to QA Join</name>
+		<metadata><![CDATA[{"transitions":{"Passed QA":{"bendpoints":[]}},"xy":[719,330]}]]></metadata>
+        <transitions>
+            <transition>
+                <name>Passed QA</name>
+                <target>Project Management</target>
+            </transition>
+        </transitions>
+	</join>
+<!-- 	<condition>
+		<name>Resolution</name>
+		<metadata><![CDATA[{"transitions":{"EndNode":{"bendpoints":[]},"Yes":{"bendpoints":[]},"No":{"bendpoints":[]},"Developer":{"bendpoints":[]}},"xy":[260,37]}]]></metadata>
+		<script><![CDATA[import com.liferay.portal.kernel.util.GetterUtil;
+			import com.liferay.portal.kernel.workflow.WorkflowConstants;
+			import com.liferay.portal.service.ServiceContext;
+			import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
+			import com.liferay.portlet.dynamicdatalists.service.DDLRecordLocalServiceUtil;
+			import com.liferay.portlet.dynamicdatamapping.storage.Field;
+			
+			long companyId = GetterUtil.getLong((String) workflowContext.get(WorkflowConstants.CONTEXT_COMPANY_ID));
+			ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+
+			long ddlRecordId = GetterUtil.getLong((String)workflowContext.get(WorkflowConstants.CONTEXT_ENTRY_CLASS_PK));
+			System.out.println("ddlRecordId="+ddlRecordId);
+			DDLRecord ddlRecord = DDLRecordLocalServiceUtil.getRecord(ddlRecordId);
+			
+			Field field = ddlRecord.getField("status");
+			
+			String status = GetterUtil.getString(field.getValue());
+			if (status.contains("not")) {
+				returnValue = "No"
+			}
+			else {
+				returnValue = "Yes"
+			}
+
+		]]></script>
+		<script-language>groovy</script-language>
+		<transitions>
+			<transition>
+				<name>Yes</name>
+				<target>Developer</target>
+			</transition>
+			<transition>
+				<name>No</name>
+				<target>EndNode</target>
+			</transition>
+		</transitions>
+	</condition>
+ -->    <task>
+        <name>Project Management</name>
+        <metadata><![CDATA[{"transitions":{"Completed":{"bendpoints":[]}},"xy":[480,328]}]]></metadata>
+        <actions>
+            <notification>
+                <name>ticket process mail</name>
+                <template>&lt;#assign comments = taskComments!&quot;&quot;&gt;
+&lt;#assign portalURL = serviceContext.portalURL!&quot;&quot;&gt;
+&lt;#assign wTasksURL = portalURL+&quot;/group/control_panel/manage?p_p_id=153&amp;p_p_lifecycle=0&amp;p_p_state=maximized&amp;p_p_mode=view&amp;doAsGroupId=&quot;+groupId+&quot;&amp;refererPlid=&quot;&gt;
+
+&lt;!-- email body --&gt;
+&lt;p&gt; There is a new submission of ${entryType} waiting for review in the workflow. &lt;/p&gt;
+
+&lt;!-- personal message to assignee --&gt;
+&lt;p&gt; Please review the code waiting for you in your workflow tasks.
+&lt;#if comments != &quot;&quot; &gt; &lt;br/&gt; Assignment comment says: &lt;strong&gt;${comments}&lt;/strong&gt; &lt;/#if&gt;
+&lt;/p&gt;
+&lt;p&gt; &lt;a href=&quot;${wTasksURL}&quot;&gt;Click here&lt;/a&gt; to see workflow tasks assigned to you. &lt;/p&gt;
+
+&lt;!-- signature --&gt;
+&lt;p&gt;Sincerely,&lt;br /&gt;&lt;strong&gt;Liferay Portal Workflow&lt;/strong&gt;&lt;/p&gt;</template>
+                <template-language>freemarker</template-language>
+                <notification-type>email</notification-type>
+                <notification-type>user-notification</notification-type>
+                <execution-type>onEntry</execution-type>
+            </notification>
+        </actions>
+        <assignments>
+            <user></user>
+        </assignments>
+        <transitions>
+            <transition>
+                <name>Completed</name>
+                <target>EndNode</target>
+            </transition>
+        </transitions>
+    </task>
+</workflow-definition>

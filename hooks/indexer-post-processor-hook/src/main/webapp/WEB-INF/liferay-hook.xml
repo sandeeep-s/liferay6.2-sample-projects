@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!DOCTYPE hook PUBLIC "-//Liferay//DTD Hook 6.2.0//EN" "http://www.liferay.com/dtd/liferay-hook_6_2_0.dtd">
+
+<hook>
+    <indexer-post-processor>
+        <indexer-class-name>com.liferay.portal.model.User</indexer-class-name>
+        <indexer-post-processor-impl>com.liferay.docs.hook.indexer.SampleIndexerPostProcessor</indexer-post-processor-impl>
+    </indexer-post-processor>
+</hook>

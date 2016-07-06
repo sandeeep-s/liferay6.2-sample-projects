@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE routes PUBLIC "-//Liferay//DTD Friendly URL Routes 6.2.0//EN"
+"http://www.liferay.com/dtd/liferay-friendly-url-routes_6_2_0.dtd">
+
+<routes>
+	<route>
+		<pattern>/add_guestbook</pattern>
+		<implicit-parameter name="p_p_lifecycle">0</implicit-parameter>
+		<implicit-parameter name="action">viewGuestbookEditForm</implicit-parameter>
+	</route>
+	<route>
+		<pattern>/{guestbookName}/add_entry</pattern>
+		<implicit-parameter name="p_p_lifecycle">0</implicit-parameter>
+		<implicit-parameter name="action">viewEntryEditForm</implicit-parameter>
+	</route>
+	<route>
+		<pattern>/{entryId}/edit_entry</pattern>
+		<implicit-parameter name="p_p_lifecycle">0</implicit-parameter>
+		<implicit-parameter name="action">viewEntryEditForm</implicit-parameter>
+	</route>
+	<route>
+		<pattern>/{guestbookName}/{name}/view_entry</pattern>
+		<implicit-parameter name="p_p_lifecycle">0</implicit-parameter>
+		<implicit-parameter name="action">viewEntry</implicit-parameter>
+	</route>
+	<route>
+		<pattern>/{guestbookName}/view</pattern>
+		<implicit-parameter name="p_p_lifecycle">0</implicit-parameter>
+	</route>
+	<route>
+		<pattern>/search</pattern>
+		<implicit-parameter name="p_p_lifecycle">0</implicit-parameter>
+		<implicit-parameter name="action">viewSearchResults</implicit-parameter>
+	</route>
+	<route>
+		<pattern>/main/view</pattern>
+		<implicit-parameter name="p_p_lifecycle">0</implicit-parameter>
+	</route>
+	<route>
+		<pattern>/{guestbookName}/addEntry</pattern>
+		<implicit-parameter name="p_p_lifecycle">1</implicit-parameter>
+		<implicit-parameter name="action">addEntry</implicit-parameter>
+	</route>
+</routes>
